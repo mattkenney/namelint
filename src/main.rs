@@ -3,7 +3,7 @@ use std::fs::{self};
 use std::path::Path;
 use std::collections::VecDeque;
 use std::ffi::OsString;
-use clap::{arg, Arg, ArgAction, Command};
+use clap::{arg, Arg, Command};
 use regex::RegexBuilder;
 
 //struct for configuration
@@ -16,10 +16,13 @@ fn main() {
         .version("1.0")
         .about("lint your file names")
         .arg(Arg::new("msdos")
-            .action(ArgAction::SetTrue)
+            .default_missing_value("true")
             .default_value("false")
             .help("Allow MS-DOS reserved file names (LPT1, COM1, etc.)")
             .long("allow-msdos")
+            .num_args(0..=1)
+            .require_equals(true) 
+            .value_name("true|false")
             .value_parser(clap::builder::BoolishValueParser::new())
         )
         .arg(arg!(<path>... "paths to check")
@@ -83,7 +86,7 @@ fn visit_dirs(config: &Config, dir: &OsString) -> io::Result< Vec<OsString> > {
             if entry_path.is_dir() {
                 new_dirs.push(entry_path.into_os_string());
             } else {
-                println!("File: {:?}", &path);
+                println!("File: {:?}", &entry_path);
             }
         }
     }
