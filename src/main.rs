@@ -25,12 +25,9 @@ fn main() {
     }
     while path_queue.len() > 0 {
         let next_path = path_queue.pop_front().unwrap();
-        let new_paths = visit_dirs(Path::new(&next_path));
-        if new_paths.is_err() { continue; }
-        if let Ok(new_paths) = new_paths {
-            for new_path in new_paths.iter() {
+        let new_paths = visit_dirs(Path::new(&next_path)).unwrap_or_else(|e| panic!("Unable to visit directory '{}': {}", next_path.to_string_lossy(), e));
+        for new_path in new_paths.iter() {
             path_queue.push_back(new_path.clone());
-            }
         }
     }
 }
@@ -39,6 +36,10 @@ fn main() {
 fn visit_dirs(dir: &Path) -> io::Result< Vec<OsString> > {
     let mut new_dirs:Vec::<OsString> = Vec::new();
     println!("Processing {:?}", dir);
+    if dir.exists() == false {
+        //println!("Path does not exist: {:?}", dir);
+        return Err(io::Error::new(io::ErrorKind::NotFound, "Path does not exist"));
+    }
     if dir.is_dir() {
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
