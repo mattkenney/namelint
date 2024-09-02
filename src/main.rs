@@ -3,7 +3,37 @@ use std::fs::{self};
 use std::path::Path;
 use std::collections::VecDeque;
 use std::ffi::OsString;
+use clap::{arg, Command};
 
+fn main() {
+    let matches = Command::new("namelint")
+        .version("1.0")
+        .about("lint your file names")
+        .arg(arg!(<path>... "paths to check")
+            .help("Path(s) to checks")
+            .trailing_var_arg(true))
+        .get_matches();
+
+    let path_args: Vec<_> = matches.get_many::<String>("path")
+        .expect("at least one path is required")
+        .collect();
+
+    let mut path_queue:VecDeque::<OsString> = VecDeque::new();
+    for path_arg in path_args.iter() {
+        let path_arg_str = *path_arg;
+        path_queue.push_back(OsString::from(path_arg_str.clone()));
+    }
+    while path_queue.len() > 0 {
+        let next_path = path_queue.pop_front().unwrap();
+        let new_paths = visit_dirs(Path::new(&next_path));
+        if new_paths.is_err() { continue; }
+        if let Ok(new_paths) = new_paths {
+            for new_path in new_paths.iter() {
+            path_queue.push_back(new_path.clone());
+            }
+        }
+    }
+}
 
 /* check all files in a directory, and return a list (possibly empty) of subdirectories */
 fn visit_dirs(dir: &Path) -> io::Result< Vec<OsString> > {
@@ -21,19 +51,4 @@ fn visit_dirs(dir: &Path) -> io::Result< Vec<OsString> > {
         }
     }
     Ok(new_dirs)
-}
-
-fn main() {
-    let mut path_queue:VecDeque::<OsString> = VecDeque::new();
-    path_queue.push_back(OsString::from("."));
-    while path_queue.len() > 0 {
-        let next_path = path_queue.pop_front().unwrap();
-        let new_paths = visit_dirs(Path::new(&next_path));
-        if new_paths.is_err() { continue; }
-        if let Ok(new_paths) = new_paths {
-            for new_path in new_paths.iter() {
-            path_queue.push_back(new_path.clone());
-            }
-        }
-    }
 }
