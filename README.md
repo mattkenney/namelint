@@ -47,16 +47,15 @@ Attribution requirement: a follow-able link to this repo on Github
 
 Also see the to-do list in [rules/README.md]
 
-- [ ] check flags/attributes
 - [ ] rules per extension
-- [ ] duplicates with only lower/upper case differences
-- [ ] action: delete/sanitize/report/etc.
-- [ ] dryrun mode for action
+- [ ] detect duplicates with only lower/upper case differences
 - [ ] specify params as regex/bytes/utf8 codepoint numbers/ascii/utf8
-- [ ] overrides: allow/deny list
+- [ ] overrides: allow/deny list (regex?)
 - [ ] CI job
 - [ ] output report format: text/json/???, 
 - [ ] output encoding: how to show bad chars in report
+- [ ] output: generate script to [delete|purify|???] (or ability to pipe to xargs?)
 - [ ] support for a `.namelint` file
+- [ ] check attributes (or separate attrlint?)
 
 

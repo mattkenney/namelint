@@ -18,20 +18,21 @@ A test contists of:
 ## Utilities
 
 - [ ] `codegen.sh` - generates the `.rs` file with all the rules.
-- [ ] `check_schema.sh` - makes sure all rules obey the schema.
 - [ ] `docgen.sh` - generates the documentation.
-- [ ] `test.sh` - runs all tests for all rules.
 
 ## Rules to make
 
-- [ ] whitespace: none/spaces/oneline/any/[list]/...
-- [ ] leading/trailing whitespace: trim-both/trim-start/trim-end
-- [ ] punctuation: singledot,dashunderscore,most
-- [ ] wildcards
-- [ ] utf8
-- [ ] windows protected file
+- [x] utf8
+- [x] leading/trailing whitespace: trim-start/trim-end
+- [x] windows reserved names
+- [ ] no chars that need shell escapes
+- [ ] internal whitespace: none
+- [ ] internal whitespace: only (single?) spaces
 - [ ] dotfiles
 - [ ] posix safe chars
 - [ ] url safe/url component safe/etc
+- [ ] punctuation: singledot,dashunderscore,most
 - [ ] case: upper/lower/camel/snake/kebab/pascal/...
-- [ ] extensions: all/web/mime/common/uppercase/lowercase/[list]/...
+- [ ] extension case: upper/lower
+- [ ] extensions: all/web/mime/common/[list]/...
+- [ ] tests (and `--test-rules` to run the tests)
