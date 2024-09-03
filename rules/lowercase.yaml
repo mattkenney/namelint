@@ -1,0 +1,11 @@
+default_missing_value: "false"
+default_value: "false"
+description: |
+  Base file name (i.e. without extension) must be lowercase ASCII alphanumeric.
+help: "Lowercase file names"
+long: "lowercase"
+regex:
+  pattern: "^[a-z0-9.]+([.][a-zA-Z0-9]+)?$"
+  case_insensitive: false
+  result: "pass"
+title: "Lowercase File Names"

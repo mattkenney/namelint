@@ -1,0 +1,12 @@
+default_missing_value: "true"
+default_value: "true"
+description: |
+  These filenames are reserved in MS-DOS (and thus Microsoft Windows) and cannot be used for files or directories
+  if they are to be accessed from MS-DOS or Windows. This rule is case-insensitive.
+help: "Allow MS-DOS reserved file names (LPT1, COM1, etc.)"
+long: "no-msdos-reserved"
+regex:
+  pattern: "^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)$"
+  case_insensitive: true
+  result: "fail"
+title: "MS-DOS Reserved Files"

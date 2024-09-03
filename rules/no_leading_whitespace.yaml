@@ -1,0 +1,10 @@
+default_missing_value: "true"
+default_value: "true"
+description: |
+  Don't allow leading whitespace.
+help: "Don't allow leading whitespace"
+long: "no-leading-whitespace"
+regex: 
+  pattern: "^\\s+"
+  result: "fail"
+title: "No leading whitespace"
