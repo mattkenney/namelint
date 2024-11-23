@@ -25,8 +25,8 @@ struct Rule {
     default_missing_value: String,
     default_value: String,
     description: String,
+    handle: String,
     help: String,
-    long: String,
     regex: RuleRegex,
 }
 
@@ -54,7 +54,7 @@ fn main() {
             .default_missing_value(default_missing_value)
             .default_value(clap::builder::OsStr::from(rule.default_value))
             .help(clap::builder::StyledStr::from(rule.help))
-            .long(clap::builder::Str::from(rule.long))
+            .long(clap::builder::Str::from(rule.handle))
             .num_args(0..=1)
             .require_equals(true) 
             .value_name("true|false")

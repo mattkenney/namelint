@@ -3,7 +3,7 @@ default_value: "false"
 description: |
   Base file name (i.e. without extension) must be uppercase ASCII alphanumeric.
 help: "Uppercase file names"
-long: "uppercase"
+handle: "uppercase"
 regex:
   pattern: "^[A-Z0-9.]+([.][a-zA-Z0-9]+)?$"
   case_insensitive: false

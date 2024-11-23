@@ -3,7 +3,7 @@ default_value: "true"
 description: |
   Don't allow leading whitespace.
 help: "Don't allow leading whitespace"
-long: "no-leading-whitespace"
+handle: "no-leading-whitespace"
 regex: 
   pattern: "^\\s+"
   result: "fail"

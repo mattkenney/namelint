@@ -3,7 +3,7 @@ default_value: "true"
 description: |
   Don't allow trailing whitespace.
 help: "Don't allow trailing whitespace"
-long: "no-trailing-whitespace"
+handle: "no-trailing-whitespace"
 regex: 
   pattern: "\\s+$"
   result: "fail"
