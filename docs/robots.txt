@@ -1,0 +1,7 @@
+#
+# robots.txt for namelint.fileformat.info
+#
+
+User-agent: *
+Disallow: /honeypot.txt
+Allow: /

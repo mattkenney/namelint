@@ -1,9 +1,6 @@
-# namelint [<img alt="Logo for namelint" src="docs/favicon.svg" height="96" align="right"/>](https://github.com/FileFormatInfo/namelint)
+# namelint [<img alt="Logo for namelint" src="docs/favicon.svg" height="96" align="right"/>](https://namelint.fileformat.info/)
 
-> [!NOTE]  
-> This is "README-driven development".  There is no code yet, just an overview of what I think it should do.
-
-Checks for invalid/deceptive/hacked file names.
+Check file names for security, compatibility, best practices & standards.
 
 ## Background
 
@@ -15,9 +12,7 @@ Checks for invalid/deceptive/hacked file names.
 
 ## License
 
-Copyright &copy; 2024 by Andrew Marcuse under [CC BY-SA 4.0](LICENSE.txt)
-
-Attribution requirement: a follow-able link to this repo on Github
+[GPLv3](LICENSE.txt)
 
 ## Credits
 
@@ -42,20 +37,3 @@ Attribution requirement: a follow-able link to this repo on Github
 - [batista/lint-filenames](https://github.com/batista/lint-filenames) - Go, regex rules
 - https://richjenks.com/filename-regex/
 - https://github.com/sindresorhus/filename-reserved-regex
-
-## To Do
-
-Also see the to-do list in [rules/README.md]
-
-- [ ] rules per extension
-- [ ] detect duplicates with only lower/upper case differences
-- [ ] specify params as regex/bytes/utf8 codepoint numbers/ascii/utf8
-- [ ] overrides: allow/deny list (regex?)
-- [ ] CI job
-- [ ] output report format: text/json/???, 
-- [ ] output encoding: how to show bad chars in report
-- [ ] output: generate script to [delete|purify|???] (or ability to pipe to xargs?)
-- [ ] support for a `.namelint` file
-- [ ] check attributes (or separate attrlint?)
-
-
