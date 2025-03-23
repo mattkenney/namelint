@@ -1,0 +1,24 @@
+rules:
+  - description: |
+      Don't allow leading whitespace.
+    handle: "no-leading-whitespace"
+    regex:
+      pattern: "^\\s+"
+      result: "fail"
+    title: "No leading whitespace"
+
+  - description: |
+      Don't allow any whitespace characters.
+    handle: "no-whitespace"
+    regex:
+      pattern: "\\s"
+      result: "fail"
+    title: "No whitespace"
+
+  - description: |
+      Only allow single space inside words.
+    handle: "single-space"
+    regex:
+      pattern: "LATER"
+      result: "fail"
+    title: "No whitespace except interior single spaces"

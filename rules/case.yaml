@@ -1,0 +1,21 @@
+rules:
+  - description: |
+      Base file name (i.e. without extension) must be uppercase ASCII alphanumeric.
+    help: "Uppercase file names"
+    handle: "uppercase-ascii"
+    regex:
+      pattern: "^[A-Z0-9.]+([.][a-zA-Z0-9]+)?$"
+      case_insensitive: false
+      result: "pass"
+    title: "Uppercase file names (ASCII)"
+
+  - description: |
+      Base file name (i.e. without extension) must be lowercase ASCII alphanumeric.
+    handle: "lowercase-ascii"
+    help: "Lowercase file names"
+    regex:
+      pattern: "^[a-z0-9.]+([.][a-zA-Z0-9]+)?$"
+      case_insensitive: false
+      result: "pass"
+    title: "Lowercase file names (ASCII)"
+

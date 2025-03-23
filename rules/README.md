@@ -4,7 +4,7 @@ Each `.yaml` file has one or more rules.
 
 A rule consists of:
 - handle: kebab-case unique id
-- name: Human-readable name
+- title: Human-readable name
 - description: longer markdown description/discussion including sources/background/references/etc.
 - regex: the rule
 - LATER rules: list of other rules to apply in addition to the regex.  Allows various combinations with `+` (and), '|' (or) `!` (not) and `()` (precedence)
