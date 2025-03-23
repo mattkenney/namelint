@@ -22,3 +22,8 @@ properties:
         type: array
         items:
           type: string
+    required:
+      - id
+      - rules
+required:
+  - ruleset
