@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: https://namelint.fileformat.info/namelint-rule-schema.json
+$id: https://namelint.fileformat.info/namelint-ruleset-schema.json
 title: Namelint rule set schema
 description: >-
   Filename validation rule set - allows a pick-and-choose set of rules to be
