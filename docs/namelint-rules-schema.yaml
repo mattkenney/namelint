@@ -12,7 +12,7 @@ properties:
       properties:
         id:
           type: string
-          description: Code-friendly id for the rule set
+          description: Code-friendly id for the rule
         title:
           type: string
           description: Human friendly short name for the rule
