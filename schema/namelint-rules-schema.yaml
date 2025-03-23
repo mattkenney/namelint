@@ -37,3 +37,5 @@ properties:
             - expect
       required:
         - id
+required:
+  - rules
