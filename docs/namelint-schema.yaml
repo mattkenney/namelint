@@ -1,6 +1,6 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: https://namelint.fileformat.info/namelint-rules-schema.json
-title: Namelint rule file schema
+title: Namelint config file schema
 description: >-
   List of filename validation rules
 type: object
@@ -37,5 +37,27 @@ properties:
             - expect
       required:
         - id
-required:
-  - rules
+  ruleset:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Code-friendly id for the rule set
+      title:
+        type: string
+        description: Human-friendly short name for the rule set
+      description:
+        type: string
+        description: Longer description of the rule set, in markdown
+      paths:
+        type: array
+        items:
+          type: string
+      rules:
+        type: array
+        items:
+          type: string
+      rulesets:
+        type: array
+        items:
+          type: string
