@@ -1,26 +1,33 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: https://namelint.fileformat.info/namelint-schema.json
-title: Namelint config file schema
+title: Namelint rule definition file schema
 description: >-
-  List of filename validation rules
+  Schema for the definition of filename rules and rule sets
 type: object
+additionalProperties: false
 properties:
   rules:
     type: array
+    description: Rule definitions
     items:
       type: object
+      additionalProperties: false
       properties:
-        id:
+        rule_id:
           type: string
-          description: Code-friendly id for the rule
+          description: >-
+            Code-friendly id for the rule
         title:
           type: string
-          description: Human friendly short name for the rule
+          description: >-
+            Human friendly short name for the rule
         description:
           type: string
-          description: Longer description of the rule, in markdown
+          description: >-
+            Longer description of the rule, in markdown
         regex:
           type: object
+          additionalProperties: false
           properties:
             pattern:
               type: string
@@ -36,28 +43,37 @@ properties:
             - pattern
             - expect
       required:
-        - id
-  ruleset:
-    type: object
-    properties:
-      id:
-        type: string
-        description: Code-friendly id for the rule set
-      title:
-        type: string
-        description: Human-friendly short name for the rule set
-      description:
-        type: string
-        description: Longer description of the rule set, in markdown
-      paths:
-        type: array
-        items:
+        - rule_id
+  rulesets:
+    type: array
+    description: Rule set definitions
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        ruleset_id:
           type: string
-      rules:
-        type: array
-        items:
+          description: >-
+            Code-friendly id for the rule set
+        title:
           type: string
-      rulesets:
-        type: array
-        items:
+          description: >-
+            Human-friendly short name for the rule set
+        description:
           type: string
+          description: >-
+            Longer description of the rule set, in markdown
+        rules:
+          type: array
+          description: >-
+            List of rule_id of rules to include in this rule set
+          items:
+            type: string
+        rulesets:
+          type: array
+          description: >-
+            List of ruleset_id of rule sets to include in this rule set
+          items:
+            type: string
+      required:
+        - ruleset_id
