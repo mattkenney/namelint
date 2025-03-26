@@ -1,5 +1,6 @@
 # namelint [<img alt="Logo for namelint" src="docs/favicon.svg" height="96" align="right"/>](https://namelint.fileformat.info/)
 
+[![rule-validation](https://github.com/FileFormatInfo/namelint/actions/workflows/rule-validation.yaml/badge.svg)](https://github.com/FileFormatInfo/namelint/actions/workflows/rule-validation.yaml)
 [![website-deploy](https://github.com/FileFormatInfo/namelint/actions/workflows/website-deploy.yaml/badge.svg)](https://github.com/FileFormatInfo/namelint/actions/workflows/website-deploy.yaml)
 
 Check file names for security, compatibility, best practices & standards.
