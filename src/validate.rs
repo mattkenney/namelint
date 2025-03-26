@@ -4,7 +4,7 @@ use std::fs::{self};
 
 
 fn main() {
-	let default_schema: &'static str = include_str!("../docs/namelint-schema.json");
+	let default_schema: &'static str = include_str!("../docs/namelint-schema.yaml");
 
 	let mut command = Command::new("namelint")
 		.version("1.0")
@@ -33,20 +33,36 @@ fn main() {
 	let binding = command.get_matches();
 	let schema_file = binding.get_one::<String>("schema");
 	let schema_str: String;
+	let mut schema_type = "json";
 	if schema_file.is_none() {
 		println!("INFO: Using default schema");
 		schema_str = default_schema.to_string();
+		schema_type = "yaml";
 	} else {
-		println!("INFO: Using schema file {}", schema_file.unwrap());
-		schema_str = fs::read_to_string(schema_file.unwrap()).unwrap();
+		let schema_file = schema_file.unwrap();
+		println!("INFO: Using schema file {}", schema_file);
+		schema_str = fs::read_to_string(schema_file).unwrap();
+		if schema_file.ends_with("yml") || schema_file.ends_with("yaml") {	// LATER or sniff first char of file?
+			schema_type = "yaml";
+		}
 	}
 
-	let schema = serde_json::from_str(&schema_str);
-	if schema.is_err() {
-		println!("ERROR: unable to parse schema: {}", schema.err().unwrap());
-		std::process::exit(1);
-	}
-	let schema = schema.unwrap();
+	let schema = if schema_type == "yaml" {
+		let yaml_schema: Result<serde_yaml::Value, _> = serde_yaml::from_str(&schema_str);
+		if yaml_schema.is_err() {
+			println!("ERROR: unable to parse built-in schema: {}", yaml_schema.err().unwrap());
+			std::process::exit(1);
+		}
+		let yaml_schema = yaml_schema.unwrap();
+		serde_json::from_str(&serde_json::to_string(&yaml_schema).unwrap()).unwrap()
+	} else {
+		let schema = serde_json::from_str(&schema_str);
+		if schema.is_err() {
+			println!("ERROR: unable to parse schema '{}': {}", schema_file.unwrap(), schema.err().unwrap());
+			std::process::exit(1);
+		}
+		schema.unwrap()
+	};
 
 	let validator = jsonschema::validator_for(&schema);
 	if validator.is_err() {
@@ -68,13 +84,13 @@ fn main() {
 		}
 		let body = body.unwrap();
 		if body.is_empty() {
-			println!("WARNING: Skipping empty file {}", path);
+			println!("WARNING: Skipping empty file '{}'", path);
 			continue;
 		}
 
 		let yaml_data: Result<serde_yaml::Value, _> = serde_yaml::from_str(&body);
 		if yaml_data.is_err() {
-			println!("ERROR: unable to parse rules file {}: {}", path, yaml_data.err().unwrap());
+			println!("ERROR: unable to parse rules file '{}': {}", path, yaml_data.err().unwrap());
 			error_count += 1;
 			continue;
 		}
