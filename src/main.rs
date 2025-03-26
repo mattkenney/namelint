@@ -1,3 +1,5 @@
+pub mod validate;
+
 use std::fs::{self};
 use std::path::Path;
 use std::collections::{HashMap, VecDeque};
@@ -23,16 +25,23 @@ struct RuleRegex {
 #[derive(serde::Deserialize,Debug, Clone)]
 struct Rule {
 	//description: String,
-	handle: String,
+	rule_id: String,
 	regex: Option<RuleRegex>,
 	title: String,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
 struct RuleSet {
-	handle: Option<String>,
-	rules: Vec<Rule>,
+	ruleset_id: String,
+	//rules: Vec<String>,
+	//rulesets: Vec<String>,
 	title: Option<String>,
+}
+
+#[derive(serde::Deserialize, Debug, Clone)]
+struct RuleFile {
+	rules: Option<Vec<Rule>>,
+	rulesets: Option<Vec<RuleSet>>,
 }
 
 fn main() {
@@ -46,7 +55,7 @@ fn main() {
 		.required(false)
 		.value_parser(clap::value_parser!(String)));
 
-	command = command.arg(arg!(--ruleset <RULESET> "Specify additional rulesets to load")
+	command = command.arg(arg!(--rules <FILE> "Specify additional rule definitions to load")
 		.required(false)
 		.num_args(1..)
 		.value_parser(clap::value_parser!(String)));
@@ -61,39 +70,42 @@ fn main() {
 	for rule_file in RULES_DIR.find("*.yaml").unwrap() {
 		let body = RULES_DIR.get_file(rule_file.path()).unwrap().contents_utf8().unwrap();
 
-		let file_id = rule_file.path().file_stem().unwrap().to_str().unwrap();
-		println!("Loading rules file {} ({})", file_id, rule_file.path().display());
-		let mut ruleset: RuleSet = serde_yaml::from_str(body)
-			.unwrap_or_else(|e| panic!("Unable to load ruleset {} ({}): {}", file_id, rule_file.path().display(), e));
+		println!("DEBUG: Loading rules file {}", rule_file.path().display());
+		let rulef: RuleFile = serde_yaml::from_str(body)
+			.unwrap_or_else(|e| panic!("Unable to load rules file {}: {}", rule_file.path().display(), e));
 
-		if ruleset.handle.is_none() {
-			ruleset.handle = Some(file_id.to_string());
-		}
-		if ruleset.title.is_none() {
-			ruleset.title = Some(file_id.to_string());
-		}
-		all_rulesets.insert(ruleset.handle.clone().unwrap(), ruleset.clone());
-
-		for rule in ruleset.rules.iter_mut() {
-			println!("Rule: {} ({})", rule.title, rule.handle);
-			if rule.regex.is_some() {
-				let rule_regex = rule.regex.as_mut().unwrap();
-				let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
-				if rule_regex.case_insensitive {
-					regex_builder.case_insensitive(true);
-				}
-				let regex = regex_builder.build();
-				if regex.is_ok() {
-					rule_regex.regex = regex.ok();
-				} else {
-					println!("Rule {} regex: invalid ({})", rule.handle, regex.err().unwrap());
-				}
-
+		if rulef.rulesets.is_some() {
+			let mut rulesets = rulef.rulesets.unwrap();
+			for ruleset in rulesets.iter_mut() {
+				println!("DEBUG: Loading ruleset: {} ({})", ruleset.title.as_ref().unwrap_or(&"unnamed".to_string()), ruleset.ruleset_id.as_mut());
+				all_rulesets.insert(ruleset.ruleset_id.clone(), ruleset.clone());
 			}
-			all_rules.insert(rule.handle.clone(), rule.clone());
+		}
+
+		if rulef.rules.is_some() {
+			let mut rules = rulef.rules.unwrap();
+			for rule in rules.iter_mut() {
+				println!("DEBUG: Loading rule: {} ({})", rule.title, rule.rule_id);
+				if rule.regex.is_some() {
+					let rule_regex = rule.regex.as_mut().unwrap();
+					let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
+					if rule_regex.case_insensitive {
+						regex_builder.case_insensitive(true);
+					}
+					let regex = regex_builder.build();
+					if regex.is_ok() {
+						rule_regex.regex = regex.ok();
+					} else {
+						println!("ERROR: Invalid regex for rule_id {}: {}", rule.rule_id, regex.err().unwrap());
+						continue;
+					}
+
+				}
+				all_rules.insert(rule.rule_id.clone(), rule.clone());
+			}
 		}
 	}
-	println!("INFO: loaded {} rules from {} built-in rulesets", all_rules.len(), all_rulesets.len());
+	println!("INFO: loaded {} rules and {} rulesets from built-in files", all_rules.len(), all_rulesets.len());
 
 	//LATER: load rulesets specified on the command line
 
@@ -131,7 +143,7 @@ fn main() {
 fn test_name(_rules: &Vec<Rule>, name: &OsString) -> core::result::Result<(), String>{
 	let name_str = std::str::from_utf8(name.as_encoded_bytes());
 	if name_str.is_err() {
-		return Err("Path is not UTF-8".to_string());
+		return Err("ERROR: Path is not UTF-8".to_string());
 	}
 	/*
 	let name_str = name_str.unwrap();
@@ -153,9 +165,8 @@ fn test_name(_rules: &Vec<Rule>, name: &OsString) -> core::result::Result<(), St
 /* check all files in a directory, and return a list (possibly empty) of subdirectories */
 fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String > {
 
-
 	let mut new_dirs:Vec::<OsString> = Vec::new();
-	println!("Processing {:?}", dir);
+	println!("INFO: Processing {:?}", dir);
 	let path = Path::new(dir);
 	if path.file_name().is_some() {     // needed for root and . directory
 		let dir_name = path.file_name().unwrap();
@@ -178,7 +189,7 @@ fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String
 		if entry_path.is_dir() {
 			new_dirs.push(entry_path.into_os_string());
 		} else {
-			println!("File: {:?}", &entry_path);
+			println!("DEBUG: Processing file: {:?}", &entry_path);
 		}
 	}
 	Ok(new_dirs)

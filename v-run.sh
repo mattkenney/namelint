@@ -21,5 +21,6 @@ else
 fi
 
 
-# run the app
-cargo watch --clear --exec "run --bin namelint -- ./src ./docs"
+# run src/validate.rs and watch for changes
+cargo watch -x 'run --bin validate rules/*.yaml' --watch src --watch rules --clear
+
