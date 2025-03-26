@@ -20,8 +20,7 @@ else
   export COMMIT="$(git rev-parse --short HEAD)"
 fi
 
-# install development tools
-cargo install --locked --quiet --version 3.12.0 bacon
 
-# run the app
-bacon run -- --bin namelint ./src ./docs
+# run src/validate.rs and watch for changes
+cargo watch -x 'run --bin validate rules/*.yaml' --watch src --watch rules --clear
+
