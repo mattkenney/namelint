@@ -23,14 +23,14 @@ struct RuleRegex {
 #[derive(serde::Deserialize,Debug, Clone)]
 struct Rule {
 	//description: String,
-	handle: String,
+	rule_id: String,
 	regex: Option<RuleRegex>,
 	title: String,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
 struct RuleSet {
-	handle: Option<String>,
+	ruleset_id: Option<String>,
 	rules: Vec<Rule>,
 	title: Option<String>,
 }
@@ -66,16 +66,16 @@ fn main() {
 		let mut ruleset: RuleSet = serde_yaml::from_str(body)
 			.unwrap_or_else(|e| panic!("Unable to load ruleset {} ({}): {}", file_id, rule_file.path().display(), e));
 
-		if ruleset.handle.is_none() {
-			ruleset.handle = Some(file_id.to_string());
+		if ruleset.ruleset_id.is_none() {
+			ruleset.ruleset_id = Some(file_id.to_string());
 		}
 		if ruleset.title.is_none() {
 			ruleset.title = Some(file_id.to_string());
 		}
-		all_rulesets.insert(ruleset.handle.clone().unwrap(), ruleset.clone());
+		all_rulesets.insert(ruleset.ruleset_id.clone().unwrap(), ruleset.clone());
 
 		for rule in ruleset.rules.iter_mut() {
-			println!("Rule: {} ({})", rule.title, rule.handle);
+			println!("Rule: {} ({})", rule.title, rule.rule_id);
 			if rule.regex.is_some() {
 				let rule_regex = rule.regex.as_mut().unwrap();
 				let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
@@ -86,11 +86,11 @@ fn main() {
 				if regex.is_ok() {
 					rule_regex.regex = regex.ok();
 				} else {
-					println!("Rule {} regex: invalid ({})", rule.handle, regex.err().unwrap());
+					println!("Rule {} regex: invalid ({})", rule.rule_id, regex.err().unwrap());
 				}
 
 			}
-			all_rules.insert(rule.handle.clone(), rule.clone());
+			all_rules.insert(rule.rule_id.clone(), rule.clone());
 		}
 	}
 	println!("INFO: loaded {} rules from {} built-in rulesets", all_rules.len(), all_rulesets.len());

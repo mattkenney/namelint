@@ -20,6 +20,8 @@ else
   export COMMIT="$(git rev-parse --short HEAD)"
 fi
 
+# install development tools
+cargo install --locked --quiet --version 3.12.0 bacon
 
 # run the app
-cargo watch --clear --exec "run -- ./src ./docs"
+bacon run -- ./src ./docs
