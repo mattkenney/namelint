@@ -22,5 +22,5 @@ fi
 
 
 # run src/validate.rs and watch for changes
-cargo watch -x 'run --bin validate rules/*.yaml' --watch src --watch rules --clear
+cargo watch -x 'run --bin validate-cli rules/*.yaml' --watch src --watch rules --clear
 

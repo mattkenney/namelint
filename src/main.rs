@@ -1,4 +1,6 @@
 pub mod validate;
+mod schema;
+pub mod load;
 
 use std::fs::{self};
 use std::path::Path;

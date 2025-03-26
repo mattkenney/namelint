@@ -17,5 +17,5 @@ name = "namelint"
 path = "src/main.rs"
 
 [[bin]]
-name = "validate"
-path = "src/validate.rs"
+name = "validate-cli"
+path = "src/validate-cli.rs"
