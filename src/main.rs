@@ -1,9 +1,10 @@
 mod safe_name;
 mod load;
 mod schema;
+mod rules;
 
 use std::fs::{self};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::collections::{HashMap, VecDeque};
 use std::ffi::OsString;
 use clap::{arg, Command};
@@ -120,17 +121,42 @@ fn main() {
 		.expect("at least one path is required")
 		.collect();
 
-	let mut path_queue:VecDeque::<OsString> = VecDeque::new();
-	for path_arg in path_args.iter() {
-		let path_arg_str = *path_arg;
-		path_queue.push_back(OsString::from(path_arg_str.clone()));
-	}
-
 	let selected_rules: Vec<Rule> = Vec::new();
 
+	let mut path_queue:VecDeque::<PathBuf> = VecDeque::new();
+	for path_arg in path_args.iter() {
+		let path_arg_str = *path_arg;
+		let path = Path::new(path_arg_str);
+		if path.exists() == false {
+			println!("ERROR: Path does not exist: '{}'", path_arg_str);
+			continue;
+		}
+		if path.is_dir() {
+			println!("DEBUG: queueing directory '{}'", path_arg_str);
+			//LATER: also print canonical path
+			path_queue.push_back(path.to_path_buf());
+		} else if path.is_file() {
+			//LATER: should this be a warning, since they're probably using shell wildcards?
+			println!("DEBUG: processing file from command '{}'", path_arg_str);
+			process_file(&selected_rules, path);
+		} else {
+			println!("ERROR: Path is not a file or directory: '{}'", path_arg_str);
+		}
+	}
+
 	while path_queue.len() > 0 {
-		let next_path = path_queue.pop_front().unwrap();
-		let new_paths = visit_dir(&selected_rules, &next_path).unwrap_or_else(|e| panic!("Unable to visit directory '{}': {}", next_path.to_string_lossy(), e));
+		let next_path = path_queue.pop_front();
+		if next_path.is_none() {
+			break;
+		}
+		let next_path = next_path.unwrap();
+
+		let new_paths = visit_dir(&selected_rules, &next_path);
+		if new_paths.is_err() {
+			println!("ERROR: Unable to visit directory {}: {}", next_path.to_string_lossy(), new_paths.err().unwrap());
+			continue;
+		}
+		let new_paths = new_paths.unwrap();
 		for new_path in new_paths.iter() {
 			path_queue.push_back(new_path.clone());
 		}
@@ -158,23 +184,40 @@ fn test_name(_rules: &Vec<Rule>, name: &OsString) -> core::result::Result<(), St
 	return Ok(());
 }
 
+fn process_file(rules: &Vec<Rule>, path: &Path) {
+	let file_name = path.file_name();
+	if file_name.is_none() {
+		println!("ERROR: Unable to get file name for {:?}", path);
+		return;
+	}
+	let file_name = file_name.unwrap();
+	let results = test_name(rules, &file_name.to_os_string());
+	if results.is_err() {
+		println!("ERROR: Invalid file {}: {}", path.to_string_lossy(), results.unwrap_err());
+	}
+/*
+			if rules::nfc::nfc(entry_path.to_string_lossy()) == false {
+				println!("WARNING: Non-NFC filename: {:?}", &entry_path);
+			}
+*/
+}
 
 /* check all files in a directory, and return a list (possibly empty) of subdirectories */
-fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String > {
+fn visit_dir(rules: &Vec<Rule>, dir: &PathBuf) -> Result< Vec<PathBuf>, String > {
 
-	let mut new_dirs:Vec::<OsString> = Vec::new();
+	let mut new_dirs:Vec::<PathBuf> = Vec::new();
 
-	let dir_str = dir.clone().into_string();
-	if dir_str.is_err() {
+	let dir_str = dir.to_str();
+	if dir_str.is_none() {
 		return Err("Directory name is not valid unicode".to_string());
 	}
 	let dir_str = dir_str.unwrap();
 
-	println!("INFO: Processing directory '{:?}'", safe_string(dir_str.as_str()));
-	let path = Path::new(dir);
+	println!("INFO: Processing directory '{:?}'", safe_string(dir_str));
+	let path = dir.as_path();
 	let canonical_path = path.canonicalize();
 	if canonical_path.is_err() {
-		return Err(format!("Unable to canonicalize directory {}: {}", safe_string(dir_str.as_str()), canonical_path.err().unwrap()));
+		return Err(format!("Unable to canonicalize directory {}: {}", safe_string(dir_str), canonical_path.err().unwrap()));
 	}
 	let canonical_path = canonical_path.unwrap();
 	if canonical_path != path {
@@ -210,9 +253,9 @@ fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String
 		let entry = entry.unwrap();
 		let entry_path = entry.path();
 		if entry_path.is_dir() {
-			new_dirs.push(entry_path.into_os_string());
+			new_dirs.push(entry_path);
 		} else {
-			println!("DEBUG: Processing file: {:?}", &entry_path);
+			process_file(rules, &entry_path);
 		}
 	}
 	Ok(new_dirs)
