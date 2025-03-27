@@ -1,6 +1,5 @@
-pub mod validate;
 mod schema;
-pub mod load;
+mod load;
 
 use std::fs::{self};
 use std::path::Path;
@@ -11,6 +10,9 @@ use regex::{Regex, RegexBuilder};
 use include_dir::{include_dir, Dir};
 use serde_yaml;
 use serde;
+
+use schema::must_load_validator;
+use load::{must_load_yaml, must_yaml_to_json};
 
 static RULES_DIR: Dir = include_dir!("./rules");
 
@@ -62,15 +64,34 @@ fn main() {
 		.num_args(1..)
 		.value_parser(clap::value_parser!(String)));
 
+	command = command.arg(
+		arg!(--schema <FILE> "Specify an alternate schema file")
+			.required(false)
+			.value_parser(clap::value_parser!(String)),
+	);
+
 	command = command.arg(arg!(<path>... "paths to check")
 			.help("Path(s) to checks")
 			.trailing_var_arg(true));
+
+	let binding = command.get_matches();
+	let schema_file = binding.get_one::<String>("schema");
+	let validator = must_load_validator(schema_file);
 
 	let mut all_rules: HashMap<String, Rule> = HashMap::new();
 	let mut all_rulesets: HashMap<String, RuleSet> = HashMap::new();
 
 	for rule_file in RULES_DIR.find("*.yaml").unwrap() {
 		let body = RULES_DIR.get_file(rule_file.path()).unwrap().contents_utf8().unwrap();
+		let src = rule_file.path().display().to_string();
+		let yaml_data = must_load_yaml(body, &src);
+		let json_data = must_yaml_to_json(&yaml_data, &src);
+		let is_valid = validator.validate(&json_data);
+		if is_valid.is_err() {
+			println!("ERROR: Invalid rules file {}: {}", src, is_valid.err().unwrap());
+			// LATER: should this be a fatal error?
+			continue;
+		}
 
 		println!("DEBUG: Loading rules file {}", rule_file.path().display());
 		let rulef: RuleFile = serde_yaml::from_str(body)
@@ -111,7 +132,6 @@ fn main() {
 
 	//LATER: load rulesets specified on the command line
 
-	let matches = command.get_matches();
 /*
 	let mut selected_rules: HashMap<String, &RuleRegex> = HashMap::new();
 	for (rule_id, rule_regex) in all_rules.iter() {
@@ -121,7 +141,7 @@ fn main() {
 		}
 	}
 */
-	let path_args: Vec<_> = matches.get_many::<String>("path")
+	let path_args: Vec<_> = binding.get_many::<String>("path")
 		.expect("at least one path is required")
 		.collect();
 
