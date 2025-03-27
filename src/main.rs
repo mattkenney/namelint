@@ -1,5 +1,6 @@
-mod schema;
+mod safe_name;
 mod load;
+mod schema;
 
 use std::fs::{self};
 use std::path::Path;
@@ -8,6 +9,7 @@ use std::ffi::OsString;
 use clap::{arg, Command};
 use regex::{Regex, RegexBuilder};
 use include_dir::{include_dir, Dir};
+use safe_name::{safe_os_string, safe_string};
 use serde_yaml;
 use serde;
 
@@ -64,6 +66,10 @@ fn main() {
 		.action(clap::ArgAction::Append)
 		.value_parser(clap::value_parser!(String)));
 
+	command = command.arg(arg!(-v --verbose "More verbose output: repeat for even more")
+		.required(false)
+		.action(clap::ArgAction::Count));
+
 	command = command.arg(
 		arg!(--schema <FILE> "Specify an alternate schema file")
 			.required(false)
@@ -75,6 +81,7 @@ fn main() {
 			.trailing_var_arg(true));
 
 	let binding = command.get_matches();
+	//LATER: convert to log level let verbose = binding.get_count("verbose");
 	let schema_file = binding.get_one::<String>("schema");
 	let validator = must_load_validator(schema_file);
 
@@ -90,17 +97,15 @@ fn main() {
 
 	if binding.contains_id("rules") {
 		println!("DEBUG: there are custom rules");
-	} else {
-		println!("DEBUG: there are no custom rules");
-	}
-	let mut custom_rules = binding.get_many::<String>("rules")
-		.unwrap()
-		.map(|s| s.as_str());
+		let mut custom_rules = binding.get_many::<String>("rules")
+			.unwrap()
+			.map(|s| s.as_str());
 
-	while let Some(custom_rule) = custom_rules.next() {
-		let body = fs::read_to_string(custom_rule)
-			.unwrap_or_else(|e| panic!("Unable to read custom rule file {}: {}", custom_rule, e));
-		load_rules_from_str(&body, custom_rule, &validator, &mut all_rules, &mut all_rulesets);
+		while let Some(custom_rule) = custom_rules.next() {
+			let body = fs::read_to_string(custom_rule)
+				.unwrap_or_else(|e| panic!("Unable to read custom rule file {}: {}", custom_rule, e));
+			load_rules_from_str(&body, custom_rule, &validator, &mut all_rules, &mut all_rulesets);
+		}
 	}
 /*
 	let mut selected_rules: HashMap<String, &RuleRegex> = HashMap::new();
@@ -158,8 +163,24 @@ fn test_name(_rules: &Vec<Rule>, name: &OsString) -> core::result::Result<(), St
 fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String > {
 
 	let mut new_dirs:Vec::<OsString> = Vec::new();
-	println!("INFO: Processing {:?}", dir);
+
+	let dir_str = dir.clone().into_string();
+	if dir_str.is_err() {
+		return Err("Directory name is not valid unicode".to_string());
+	}
+	let dir_str = dir_str.unwrap();
+
+	println!("INFO: Processing directory '{:?}'", safe_string(dir_str.as_str()));
 	let path = Path::new(dir);
+	let canonical_path = path.canonicalize();
+	if canonical_path.is_err() {
+		return Err(format!("Unable to canonicalize directory {}: {}", safe_string(dir_str.as_str()), canonical_path.err().unwrap()));
+	}
+	let canonical_path = canonical_path.unwrap();
+	if canonical_path != path {
+		println!("WARNING: canonicalized path is different: '{}'", safe_os_string(&canonical_path.as_os_str().to_os_string()));
+	}
+
 	if path.file_name().is_some() {     // needed for root and . directory
 		let dir_name = path.file_name().unwrap();
 		let results = test_name(rules, &dir_name.to_os_string());
@@ -175,7 +196,17 @@ fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String
 		return Err(format!("Invalid directory {}: not a directory", path.to_string_lossy()));
 	}
 
-	for entry in fs::read_dir(path).unwrap() {
+	let dir_entry = fs::read_dir(path);
+	if dir_entry.is_err() {
+		return Err(format!("Unable to read directory {}: {}", path.to_string_lossy(), dir_entry.err().unwrap()));
+	}
+	let dir_entry = dir_entry.unwrap();
+
+	for entry in dir_entry {
+		if entry.is_err() {
+			println!("ERROR: Unable to read directory entry: {}", entry.err().unwrap());
+			continue;
+		}
 		let entry = entry.unwrap();
 		let entry_path = entry.path();
 		if entry_path.is_dir() {
