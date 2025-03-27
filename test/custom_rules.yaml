@@ -1,0 +1,7 @@
+rules:
+  - title: "Initial caps"
+    rule_id: "initial-caps"
+    regex:
+      pattern: "^[A-Z].*"
+      expect: "match"
+    description: "The first letter should be capitalized"

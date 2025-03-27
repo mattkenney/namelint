@@ -1,0 +1,7 @@
+rules:
+  - title: "Underscore + initial cap"
+    rule_id: "underscore-initial-caps"
+    regex:
+      pattern: "^_[A-Z].*"
+      expect: "match"
+    description: "Underscore then an initial capital letter"

@@ -24,4 +24,4 @@ fi
 cargo install --locked --quiet --version 3.12.0 bacon
 
 # run the app
-bacon run -- --bin namelint ./src ./docs
+bacon run -- --bin namelint -- --rules ./test/custom_rules.yaml --rules ./test/alt_rules.yaml ./src ./docs

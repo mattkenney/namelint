@@ -61,7 +61,7 @@ fn main() {
 
 	command = command.arg(arg!(--rules <FILE> "Specify additional rule definitions to load")
 		.required(false)
-		.num_args(1..)
+		.action(clap::ArgAction::Append)
 		.value_parser(clap::value_parser!(String)));
 
 	command = command.arg(
@@ -84,54 +84,24 @@ fn main() {
 	for rule_file in RULES_DIR.find("*.yaml").unwrap() {
 		let body = RULES_DIR.get_file(rule_file.path()).unwrap().contents_utf8().unwrap();
 		let src = rule_file.path().display().to_string();
-		let yaml_data = must_load_yaml(body, &src);
-		let json_data = must_yaml_to_json(&yaml_data, &src);
-		let is_valid = validator.validate(&json_data);
-		if is_valid.is_err() {
-			println!("ERROR: Invalid rules file {}: {}", src, is_valid.err().unwrap());
-			// LATER: should this be a fatal error?
-			continue;
-		}
-
-		println!("DEBUG: Loading rules file {}", rule_file.path().display());
-		let rulef: RuleFile = serde_yaml::from_str(body)
-			.unwrap_or_else(|e| panic!("Unable to load rules file {}: {}", rule_file.path().display(), e));
-
-		if rulef.rulesets.is_some() {
-			let mut rulesets = rulef.rulesets.unwrap();
-			for ruleset in rulesets.iter_mut() {
-				println!("DEBUG: Loading ruleset: {} ({})", ruleset.title.as_ref().unwrap_or(&"unnamed".to_string()), ruleset.ruleset_id.as_mut());
-				all_rulesets.insert(ruleset.ruleset_id.clone(), ruleset.clone());
-			}
-		}
-
-		if rulef.rules.is_some() {
-			let mut rules = rulef.rules.unwrap();
-			for rule in rules.iter_mut() {
-				println!("DEBUG: Loading rule: {} ({})", rule.title, rule.rule_id);
-				if rule.regex.is_some() {
-					let rule_regex = rule.regex.as_mut().unwrap();
-					let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
-					if rule_regex.case_insensitive {
-						regex_builder.case_insensitive(true);
-					}
-					let regex = regex_builder.build();
-					if regex.is_ok() {
-						rule_regex.regex = regex.ok();
-					} else {
-						println!("ERROR: Invalid regex for rule_id {}: {}", rule.rule_id, regex.err().unwrap());
-						continue;
-					}
-
-				}
-				all_rules.insert(rule.rule_id.clone(), rule.clone());
-			}
-		}
+		load_rules_from_str(body, &src, &validator, &mut all_rules, &mut all_rulesets);
 	}
 	println!("INFO: loaded {} rules and {} rulesets from built-in files", all_rules.len(), all_rulesets.len());
 
-	//LATER: load rulesets specified on the command line
+	if binding.contains_id("rules") {
+		println!("DEBUG: there are custom rules");
+	} else {
+		println!("DEBUG: there are no custom rules");
+	}
+	let mut custom_rules = binding.get_many::<String>("rules")
+		.unwrap()
+		.map(|s| s.as_str());
 
+	while let Some(custom_rule) = custom_rules.next() {
+		let body = fs::read_to_string(custom_rule)
+			.unwrap_or_else(|e| panic!("Unable to read custom rule file {}: {}", custom_rule, e));
+		load_rules_from_str(&body, custom_rule, &validator, &mut all_rules, &mut all_rulesets);
+	}
 /*
 	let mut selected_rules: HashMap<String, &RuleRegex> = HashMap::new();
 	for (rule_id, rule_regex) in all_rules.iter() {
@@ -215,4 +185,51 @@ fn visit_dir(rules: &Vec<Rule>, dir: &OsString) -> Result< Vec<OsString>, String
 		}
 	}
 	Ok(new_dirs)
+}
+
+
+fn load_rules_from_str(body: &str, src: &str, validator: &jsonschema::Validator, all_rules: &mut HashMap<String, Rule>, all_rulesets: &mut HashMap<String, RuleSet>) {
+	let yaml_data = must_load_yaml(body, &src);
+	let json_data = must_yaml_to_json(&yaml_data, &src);
+	let is_valid = validator.validate(&json_data);
+	if is_valid.is_err() {
+		println!("ERROR: Invalid rules file {}: {}", src, is_valid.err().unwrap());
+		// LATER: should this be a fatal error?
+		return;
+	}
+
+	println!("DEBUG: Loading rules file {}", &src);
+	let rulef: RuleFile = serde_yaml::from_str(body)
+		.unwrap_or_else(|e| panic!("Unable to load rules file {}: {}", &src, e));
+
+	if rulef.rulesets.is_some() {
+		let mut rulesets = rulef.rulesets.unwrap();
+		for ruleset in rulesets.iter_mut() {
+			println!("DEBUG: Loading ruleset: {} ({})", ruleset.title.as_ref().unwrap_or(&"unnamed".to_string()), ruleset.ruleset_id.as_mut());
+			all_rulesets.insert(ruleset.ruleset_id.clone(), ruleset.clone());
+		}
+	}
+
+	if rulef.rules.is_some() {
+		let mut rules = rulef.rules.unwrap();
+		for rule in rules.iter_mut() {
+			println!("DEBUG: Loading rule: {} ({})", rule.title, rule.rule_id);
+			if rule.regex.is_some() {
+				let rule_regex = rule.regex.as_mut().unwrap();
+				let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
+				if rule_regex.case_insensitive {
+					regex_builder.case_insensitive(true);
+				}
+				let regex = regex_builder.build();
+				if regex.is_ok() {
+					rule_regex.regex = regex.ok();
+				} else {
+					println!("ERROR: Invalid regex for rule_id {}: {}", rule.rule_id, regex.err().unwrap());
+					continue;
+				}
+
+			}
+			all_rules.insert(rule.rule_id.clone(), rule.clone());
+		}
+	}
 }
