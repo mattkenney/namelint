@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: https://namelint.fileformat.info/namelint-schema.json
+$id: https://www.namelint.dev/namelint-schema.json
 title: Namelint rule definition file schema
 description: >-
   Schema for the definition of filename rules and rule sets

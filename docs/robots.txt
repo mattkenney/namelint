@@ -1,5 +1,5 @@
 #
-# robots.txt for namelint.fileformat.info
+# robots.txt for www.namelint.dev
 #
 
 User-agent: *
