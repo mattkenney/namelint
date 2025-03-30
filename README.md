@@ -27,6 +27,9 @@ Check file names for security, compatibility, best practices & standards.
 
 ## Links
 
+- [angryfiles](https://github.com/jakeogh/angryfiles) - creates a filesystem hierarchy which is as diverse as possible.
+- [naughty strings](https://github.com/minimaxir/big-list-of-naughty-strings)
+- [homoglyphs](https://github.com/codebox/homoglyph/tree/master/raw_data)
 - https://dwheeler.com/essays/filenames-in-shell.html
 - https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 - https://learn.microsoft.com/en-us/windows/win32/fileio/filesystem-functionality-comparison
