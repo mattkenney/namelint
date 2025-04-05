@@ -25,6 +25,34 @@ properties:
           type: string
           description: >-
             Longer description of the rule, in markdown
+        examples:
+          type: array
+          items:
+            anyOf:
+              - type: object
+                properties:
+                  expect:
+                    enum:
+                      - fail
+                      - pass
+                  notes: string
+                  value: string
+                required:
+                  - expect
+                  - value
+              - type: object
+                properties:
+                  expect:
+                    enum:
+                      - fail
+                      - pass
+                  notes: string
+                  valueBytes:
+                    type: array
+                    items: integer
+                required:
+                  - expect
+                  - valueBytes
         regex:
           type: object
           additionalProperties: false
