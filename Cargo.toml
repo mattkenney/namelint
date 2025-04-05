@@ -21,3 +21,7 @@ path = "src/main.rs"
 [[bin]]
 name = "validate-cli"
 path = "src/validate-cli.rs"
+
+[[bin]]
+name = "exam-cli"
+path = "src/exam-cli.rs"

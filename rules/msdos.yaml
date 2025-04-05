@@ -8,5 +8,20 @@ rules:
       expect: "nonmatch"
     rule_id: "no-msdos-reserved"
     title: "No MS-DOS reserved filenames (LPT1, COM1, etc.)"
+    examples:
+      - value: "COM1"
+        expect: "fail"
+      - value: "com1"
+        expect: "fail"
+      - value: "com11"
+        expect: "pass"
+      - value: "COM"
+        expect: "pass"
+      - value: "COM1.txt"
+        expect: "fail"
+      - value: "NUL"
+        expect: "fail"
+      - value: "NULL"
+        expect: "pass"
 
 # LATER: 8.3 filenames
