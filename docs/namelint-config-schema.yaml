@@ -8,32 +8,39 @@ additionalProperties: false
 properties:
   dirs:
     type: array
+    description: Directories to scan
     items:
       type: string
   ignore-dirs:
     type: array
+    description: Subdirectories to ignore
     items:
       type: string
   tests:
     type: array
+    description: Apply filename rules to paths
     items:
       type: object
       additionalProperties: false
       properties:
         exclude-rules:
           type: array
+          description: Rules to specifically disable
           items:
             type: string
         paths:
           type: array
+          description: Path patterns to apply these rules to
           items:
             type: string
         rule-sets:
           type: array
+          description: Rules to apply specified by rule-set
           items:
             type: string
         rules:
           type: array
+          description: Rules to apply specified by individually
           items:
             type: string
       anyOf:
@@ -43,3 +50,6 @@ properties:
         - required:
           - rules
           - paths
+required:
+  - dirs
+  - tests
