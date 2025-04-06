@@ -35,8 +35,10 @@ properties:
                     enum:
                       - fail
                       - pass
-                  notes: string
-                  value: string
+                  notes:
+                    type: string
+                  value:
+                    type: string
                 required:
                   - expect
                   - value
@@ -46,10 +48,12 @@ properties:
                     enum:
                       - fail
                       - pass
-                  notes: string
+                  notes:
+                    type: string
                   valueBytes:
                     type: array
-                    items: integer
+                    items:
+                      type: integer
                 required:
                   - expect
                   - valueBytes
