@@ -42,6 +42,7 @@ jobs:
           sudo chown --recursive runner:docker _site
           ls -l .
           cat ./docs/namelint-schema.yaml | yq . --output-format=json >./_site/namelint-schema.json
+          cat ./docs/namelint-config-schema.yaml | yq . --output-format=json >./_site/namelint-config-schema.json
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 

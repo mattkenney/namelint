@@ -10,7 +10,7 @@ links:
   url: https://mjtsai.com/blog/2017/03/24/apfss-bag-of-bytes-filenames/
   notes: Troubles when Apple switched away from a file system with normalized file names (2017)
 
-- text: Jia Tanning Go code (Martin Tournoij)
+- text: '"Jia Tan"ing Go code (Martin Tournoij)'
   url: https://www.arp242.net/jia-tan-go.html
   notes: smuggling `_test.go` files into a regular build
 

@@ -23,5 +23,5 @@ fi
 
 # run src/validate.rs and watch for changes
 #cargo watch -x 'run --bin exam-cli -- --rules rules/msdos.yaml' --watch src --watch rules --clear
-bacon run -- --bin exam-cli -- --rules ./rules/msdos.yaml
+bacon run --headless -- --bin exam-cli -- --rules ./rules/msdos.yaml
 

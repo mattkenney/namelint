@@ -2,11 +2,9 @@
 # _config.yml for www.namelint.dev
 #
 
-collections:
-  commands:
-    output: true
 exclude: [ "CNAME" ]
 permalink: /blog/:year/:month/:day/:title/index.:output_ext
+permalink: /blog/:year/:year-:month-:day-:slug:output_ext
 production_url: https://www.namelint.dev
 title: Namelint
 kramdown:

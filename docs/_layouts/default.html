@@ -22,14 +22,60 @@
 			<a class="navbar-brand text-secondary fw-bold d-flex align-items-center" href="/">
 				<img src="/favicon.svg" alt="Logo" height="36" class="d-inline-block align-text-top me-2 py-0">
 				Namelint</a>
+			<div class="justify-content-end align-items-center d-flex">
+				<ul class="navbar-nav">
+					<li class="d-none d-md-inline nav-item">
+						<a class="nav-link{% if page.path == "index.md"%} active fw-bold{%endif%}" href="/">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link{% if page.url contains "blog/"%} active fw-bold{%endif%}" href="/blog/">
+							<img alt="Blog" class="fa d-sm-none ps-2" src="/images/fa/rss-square.svg" style="height: 1.25em;">
+							<span class="d-none d-sm-inline">Blog</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link{% if page.path == "schemas.md"%} active fw-bold{%endif%}" href="/schemas.html">
+							<img alt="Blog" class="fa d-sm-none ps-2" src="/images/fa/file-check.svg" style="height: 1.25em;">
+							<span class="d-none d-sm-inline">Schemas</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://github.com/FileFormatInfo/namelint">
+							<img alt="Contact" class="fa d-sm-none ps-2" src="/images/fa/git-alt.svg"
+								style="height: 1.25em;">
+							<span class="d-none d-sm-inline">Source</span>
+						</a>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</nav>
 	<div class="container">
 		<div class="row">
 			<div class="col pt-2">
-				<h1>{% if page.h1 %}{{page.h1}}{% else %}{{page.title}}{% endif %}</h1>
+				<h1 class="pb-2">
+					{% if page.h1 %}{{page.h1}}{% else %}{{page.title}}{% endif %}
+					<div class="d-inline-block float-end">
+						{% if page.previous.url %}
+						<a class="btn btn-outline-secondary" href="{{page.previous.url}}" title="{{page.previous.title}}">&laquo;<span
+								class="d-none d-lg-inline"> {{page.previous.title}}</span></a>
+						{% endif %}
+						{% if page.next.url %}
+						<a class="btn btn-outline-secondary" href="{{page.next.url}}" title="{{page.next.title}}"><span
+								class="d-none d-lg-inline">{{page.next.title}} </span>&raquo;</a>
+						{% endif %}
+					</div>
+				</h1>
 {{content}}
-				</div><!--/col-->
+			{% if page.url contains "blog/"-%}
+				<p class="text-center">
+					<small>
+						<a href="/blog/rss.xml"><img alt="RSS feed" src="/images/rss.svg" class="pe-2"
+								style="height:1rem;">Subscribe</a>
+					</small>
+				</p>
+			{% endif -%}
+			</div><!--/col-->
 		</div><!--/row-->
 		<hr>
 		<footer class="hidden-print">
