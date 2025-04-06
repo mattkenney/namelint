@@ -28,35 +28,23 @@ properties:
         examples:
           type: array
           items:
+            type: object
+            properties:
+              expect:
+                enum:
+                  - fail
+                  - pass
+              notes:
+                type: string
+              value:
+                type: string
             anyOf:
-              - type: object
-                properties:
-                  expect:
-                    enum:
-                      - fail
-                      - pass
-                  notes:
-                    type: string
-                  value:
-                    type: string
-                required:
-                  - expect
-                  - value
-              - type: object
-                properties:
-                  expect:
-                    enum:
-                      - fail
-                      - pass
-                  notes:
-                    type: string
-                  valueBytes:
-                    type: array
-                    items:
-                      type: integer
-                required:
-                  - expect
-                  - valueBytes
+              - required:
+                - expect
+                - value
+              - required:
+                - expect
+                - valueBytes
         regex:
           type: object
           additionalProperties: false

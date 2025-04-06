@@ -1,0 +1,45 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://www.namelint.dev/namelint-schema.json
+title: Namelint configuration file schema
+description: >-
+  Schema for the configuration of namelint
+type: object
+additionalProperties: false
+properties:
+  dirs:
+    type: array
+    items:
+      type: string
+  ignore-dirs:
+    type: array
+    items:
+      type: string
+  tests:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        exclude-rules:
+          type: array
+          items:
+            type: string
+        paths:
+          type: array
+          items:
+            type: string
+        rule-sets:
+          type: array
+          items:
+            type: string
+        rules:
+          type: array
+          items:
+            type: string
+      anyOf:
+        - required:
+          - rule-sets
+          - paths
+        - required:
+          - rules
+          - paths
