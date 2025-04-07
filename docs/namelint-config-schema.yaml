@@ -33,7 +33,7 @@ properties:
           description: Path patterns to apply these rules to
           items:
             type: string
-        rule-sets:
+        rulesets:
           type: array
           description: Rules to apply specified by rule-set
           items:
@@ -45,7 +45,7 @@ properties:
             type: string
       anyOf:
         - required:
-          - rule-sets
+          - rulesets
           - paths
         - required:
           - rules

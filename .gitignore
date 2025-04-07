@@ -1,5 +1,5 @@
 .DS_Store
-docs/namelint-schema.json
+*-schema.json
 *.env
 .jekyll-cache
 _site

@@ -1,0 +1,27 @@
+rules:
+  - description: |
+      Only allow characters in the Posix [Portable Filename Character Set](https://pubs.opengroup.org/onlinepubs/9699919799/)
+    regex:
+      pattern: "$[A-Za-z0-9._-]+$"
+      expect: "match"
+    rule_id: "posix-portable"
+    title: "Only POSIX portable filename characters"
+    examples:
+      - value: "test"
+        expect: "pass"
+      - value: "test.txt"
+        expect: "pass"
+      - value: "test.txt~"
+        expect: "fail"
+      - value: "test.txt#"
+        expect: "fail"
+      - value: "test.txt@"
+        expect: "fail"
+      - value: "test.txt!"
+        expect: "fail"
+      - value: "test.txt$"
+        expect: "fail"
+      - value: "test.txt%"
+        expect: "fail"
+
+# LATER: PATH_MAX

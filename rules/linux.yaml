@@ -1,0 +1,125 @@
+rules:
+  - description: |
+      Don't allow `.` or `..`.
+    regex:
+      pattern: "^[.]+$"
+      expect: "nonmatch"
+    rule_id: "no-dots"
+    title: "No dot files"
+    examples:
+      - value: "."
+        expect: "fail"
+      - value: ".."
+        expect: "fail"
+      - value: "..."
+        expect: "fail"
+      - value: ".gitignore"
+        expect: "pass"
+      - value: "..test"
+        expect: "pass"
+      - value: "README.md"
+        expect: "pass"
+
+  - description: |
+      Don't allow forward or backward slashes.  In theory only backward slashes are forbidden,
+      but forward slashes also cause problems.  For example: needing to be escaped in this `yaml` file.
+    regex:
+      pattern: "(/|\\\\)"
+      expect: "nonmatch"
+    rule_id: "no-slashes"
+    title: "No slashes"
+    examples:
+      - value: "/"
+        expect: "fail"
+      - value: "\\"
+        expect: "fail"
+      - value: "/test"
+        expect: "fail"
+      - value: "\\test"
+        expect: "fail"
+      - value: "test/"
+        expect: "fail"
+      - value: "test\\"
+        expect: "fail"
+      - value: "test/test"
+        expect: "fail"
+      - value: "test\\test"
+        expect: "fail"
+      - value: "test/test/test"
+        expect: "fail"
+      - value: "test"
+        expect: "pass"
+
+  - description: |
+      Don't leading dashes.  This causes some programs to think they are command line options and not file names.
+    regex:
+      pattern: "^[-].*$"
+      expect: "nonmatch"
+    rule_id: "no-leading-dash"
+    title: "No leading dashes"
+    examples:
+      - value: "-"
+        expect: "fail"
+      - value: "--"
+        expect: "fail"
+      - value: "---"
+        expect: "fail"
+      - value: "-test"
+        expect: "fail"
+      - value: "--test"
+        expect: "fail"
+      - value: "---test"
+        expect: "fail"
+      - value: "test-"
+        expect: "pass"
+      - value: "test--"
+        expect: "pass"
+      - value: "test---"
+        expect: "pass"
+      - value: "test-test"
+        expect: "pass"
+      - value: "test--test"
+        expect: "pass"
+
+  - description: |
+      No wildcards.
+    regex:
+      pattern: "[*?]"
+      expect: "nonmatch"
+    rule_id: "no-wildcards"
+    title: "No wildcards"
+    examples:
+      - value: "*"
+        expect: "fail"
+      - value: "?"
+        expect: "fail"
+      - value: "*test"
+        expect: "fail"
+      - value: "?test"
+        expect: "fail"
+      - value: "test*"
+        expect: "fail"
+      - value: "test?"
+        expect: "fail"
+      - value: "test*test"
+        expect: "fail"
+      - value: "test?test"
+        expect: "fail"
+      - value: "test"
+        expect: "pass"
+      - value: "test.txt"
+        expect: "pass"
+
+#LATER: $, <>, |, \, &, ;, `, ", ', \\, !, #, %, @
+
+rulesets:
+  - title: "Linux"
+    description: |
+      Linux ruleset.
+    rules:
+      - posix-portable
+      - no-dots
+      - no-slashes
+      - no-leading-dash
+      - no-wildcards
+    ruleset_id: "linux"
