@@ -38,3 +38,7 @@ cases:
 * [zobweyt/textcase](https://github.com/zobweyt/textcase) - Python
 * [PascalCase regex discussion](https://stackoverflow.com/a/31388507) on StackOverflow
 * [Camel case definition](https://google.github.io/styleguide/javaguide.html#s5.3-camel-case) from Google's Java style guide.
+
+<pre>
+{{page | jsonify}}
+</pre>
