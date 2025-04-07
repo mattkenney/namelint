@@ -1,6 +1,6 @@
 rules:
   - description: |
-      Only allow characters in the Posix [Portable Filename Character Set](https://pubs.opengroup.org/onlinepubs/9699919799/)
+      Only allow characters in the Posix [Portable Filename Character Set](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap03.html#tag_03_265)
     regex:
       pattern: "$[A-Za-z0-9._-]+$"
       expect: "match"
