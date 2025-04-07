@@ -8,6 +8,6 @@ The `.yaml` and `.json` versions are identical: we generate the `.json` from the
 
 {% for theFile in site.static_files -%}
 {% if theFile.path contains '-schema.' -%}
-* [{{theFile.name}}](theFile.path)
+* [{{theFile.name}}]({{theFile.name}})
 {% endif -%}
 {% endfor %}
