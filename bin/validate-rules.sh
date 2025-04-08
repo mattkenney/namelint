@@ -10,7 +10,7 @@ set -o nounset
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR="$( cd "${SCRIPT_DIR}/.." && pwd )"
 
-SCHEMA_YAML="${REPO_DIR}/docs/namelint-schema.yaml"
+SCHEMA_YAML="${REPO_DIR}/docs/namelint-rule-schema.yaml"
 YAML_DIR="${REPO_DIR}/rules"
 
 "${SCRIPT_DIR}/_validate.sh" "${SCHEMA_YAML}" "${YAML_DIR}"

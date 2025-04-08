@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: https://www.namelint.dev/namelint-schema.json
+$id: https://www.namelint.dev/namelint-config-schema.json
 title: Namelint configuration file schema
 description: >-
   Schema for the configuration of namelint

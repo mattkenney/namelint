@@ -37,7 +37,7 @@ fn main() {
 	let binding = command.get_matches();
 
 	let schema_file = binding.get_one::<String>("schema");
-	let validator = must_load_validator(schema_file);
+	let validator = must_load_validator(schema_file, true);
 
 	let mut all_rules: HashMap<String, Rule> = HashMap::new();
 	let mut all_rulesets: HashMap<String, RuleSet> = HashMap::new();

@@ -1,16 +1,17 @@
 use jsonschema::{self, Validator};
 use crate::load::{must_load_data, must_load_file};
 
-const DEFAULT_SCHEMA: &'static str = include_str!("../docs/namelint-schema.yaml");
+const DEFAULT_RULE_SCHEMA: &'static str = include_str!("../docs/namelint-rule-schema.yaml");
+const DEFAULT_CONFIG_SCHEMA: &'static str = include_str!("../docs/namelint-config-schema.yaml");
 
-pub fn must_load_validator(file_name: Option<&String>) -> Validator {
+pub fn must_load_validator(file_name: Option<&String>, is_rule: bool) -> Validator {
 	let schema_str: String;
 	let mut schema_type = "json";
 	let schema_src: &str;
 
 	if file_name.is_none() {
 		println!("INFO: Using default schema");
-		schema_str = DEFAULT_SCHEMA.to_string();
+		schema_str = if is_rule { DEFAULT_RULE_SCHEMA.to_string() } else { DEFAULT_CONFIG_SCHEMA.to_string() };
 		schema_type = "yaml";
 		schema_src = &"built-in schema";
 	} else {

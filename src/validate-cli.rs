@@ -26,7 +26,7 @@ fn main() {
 
 	let binding = command.get_matches();
 	let schema_file = binding.get_one::<String>("schema");
-	let validator = must_load_validator(schema_file);
+	let validator = must_load_validator(schema_file, true);
 
 	let mut error_count = 0;
 	let mut bad_file_count = 0;

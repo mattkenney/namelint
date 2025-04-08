@@ -28,21 +28,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: YAML to JSON
+        run: |
+          yq --version
+          ls -l .
+          cat ./docs/namelint-rule-schema.yaml | yq . --output-format=json >./docs/namelint-rule-schema.json
+          cat ./docs/namelint-config-schema.yaml | yq . --output-format=json >./docs/namelint-config-schema.json
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./docs
           destination: ./_site
-      - name: YAML to JSON
-        run: |
-          yq --version
-          ls -l .
-          sudo chown --recursive runner:docker _site
-          ls -l .
-          cat ./docs/namelint-schema.yaml | yq . --output-format=json >./_site/namelint-schema.json
-          cat ./docs/namelint-config-schema.yaml | yq . --output-format=json >./_site/namelint-config-schema.json
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
