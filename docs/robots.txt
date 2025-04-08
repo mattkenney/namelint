@@ -2,6 +2,8 @@
 # robots.txt for www.namelint.dev
 #
 
+Sitemap: https://www.namelint.dev/sitemap.xml
+
 User-agent: *
 Disallow: /honeypot.txt
 Allow: /
