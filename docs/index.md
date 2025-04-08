@@ -15,7 +15,7 @@ links:
   notes: smuggling `_test.go` files into a regular build
 
 ---
-Check file names for security, compatibility, best practices & standards.
+Check file and directory names for security, compatibility, best practices & standards.
 
 ## Why?
 {% for link in page.links %}
