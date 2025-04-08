@@ -1,5 +1,6 @@
 ---
 title: Define Rules with expressions
+tag: future
 ---
 
 Cloudflare has a [https://github.com/cloudflare/wirefilter](rust library) that supports WireShark-like filter expressions.  [Blog post](https://blog.cloudflare.com/building-fast-interpreters-in-rust/).

@@ -1,5 +1,6 @@
 ---
-title: Common Uppercase/lowercase Naming Conventions
+title: Common Case Styles
+h1: Common Uppercase/lowercase Naming Conventions
 
 cases:
 - name: Snake
@@ -11,10 +12,28 @@ cases:
 - name: Kebab
   example: this-is-a-test
   description: All lower case with hyphens
+- name: Pascal
+  example: ThisIsATest
+  description: First letter of every word capitalized, spaces removed
+- name: Camel
+  example: thisIsATest
+  description: First letter of words 2-end capitalized, spaces removed
+- name: Title
+  example: This Is A Test
+  description: First letter of every word capitalized, spaces kept
+- name: Sentence
+  example: This is a test
+  description: First letter of first word capitalized, spaces kept
+- name: Upper
+  example: THIS IS A TEST
+  description: Every letter uppercase
+- name: Lower
+  example: this is a test
+  description: Every letter lowercase
 
 ---
 
-<table class="table table-bordered table-striped">
+<table class="mt-2 table table-bordered table-striped">
 	<thead>
 		<tr>
 			<th>Name</th>
