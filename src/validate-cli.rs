@@ -2,7 +2,7 @@ mod schema;
 mod load;
 
 use clap::{arg, Command};
-use schema::must_load_validator;
+use schema::{must_load_validator, SchemaType};
 use load::load_file;
 
 fn main() {
@@ -12,12 +12,6 @@ fn main() {
 		.about("Check file names for security, compatibility, best practices & standards.");
 
 	command = command.arg(
-		arg!(--schema <FILE> "Specify an alternate schema file")
-			.required(false)
-			.value_parser(clap::value_parser!(String)),
-	);
-
-	command = command.arg(
 		arg!(<path>... "paths to check")
 			.required(true)
 			.help("Path(s) to checks")
@@ -25,8 +19,7 @@ fn main() {
 	);
 
 	let binding = command.get_matches();
-	let schema_file = binding.get_one::<String>("schema");
-	let validator = must_load_validator(schema_file, true);
+	let validator = must_load_validator(SchemaType::Rule);
 
 	let mut error_count = 0;
 	let mut bad_file_count = 0;

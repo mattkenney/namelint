@@ -9,7 +9,7 @@ use clap::{arg, Command};
 
 use parse_rules::parse_rules;
 use structs::{Rule, RuleSet};
-use schema::must_load_validator;
+use schema::{must_load_validator, SchemaType};
 
 fn main() {
 
@@ -23,11 +23,6 @@ fn main() {
 		.value_parser(clap::value_parser!(String)));
 
 	command = command.arg(
-		arg!(--schema <FILE> "Specify an alternate schema file")
-			.required(false)
-			.value_parser(clap::value_parser!(String)),
-	);
-	command = command.arg(
 		arg!(<rule_id>... "specific rules to check (defaults to all loaded rules)")
 			.required(false)
 			.help("Rule(s) to checks")
@@ -36,8 +31,7 @@ fn main() {
 
 	let binding = command.get_matches();
 
-	let schema_file = binding.get_one::<String>("schema");
-	let validator = must_load_validator(schema_file, true);
+	let validator = must_load_validator(SchemaType::Rule);
 
 	let mut all_rules: HashMap<String, Rule> = HashMap::new();
 	let mut all_rulesets: HashMap<String, RuleSet> = HashMap::new();

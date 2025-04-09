@@ -14,6 +14,7 @@ Places where to find and use namelint:
 
 ## Eventually
 
+- [ ] [pre-commit](https://pre-commit.com/) hook
 - [ ] `.deb` bundled with Debian-based Linux distributions
 - [ ] RPM and bundled with RedHat-based Linux distributions
 - [ ] Other CI runners

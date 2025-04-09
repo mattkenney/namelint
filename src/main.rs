@@ -14,7 +14,7 @@ use include_dir::{include_dir, Dir};
 use safe_name::{safe_os_string, safe_string};
 
 use parse_rules::parse_rules;
-use schema::must_load_validator;
+use schema::{must_load_validator, SchemaType};
 use structs::{Rule, RuleSet};
 
 static RULES_DIR: Dir = include_dir!("./rules");
@@ -39,20 +39,13 @@ fn main() {
 		.required(false)
 		.action(clap::ArgAction::Count));
 
-	command = command.arg(
-		arg!(--schema <FILE> "Specify an alternate schema file")
-			.required(false)
-			.value_parser(clap::value_parser!(String)),
-	);
-
 	command = command.arg(arg!(<path>... "paths to check")
 			.help("Path(s) to checks")
 			.trailing_var_arg(true));
 
 	let binding = command.get_matches();
 	//LATER: convert to log level let verbose = binding.get_count("verbose");
-	let schema_file = binding.get_one::<String>("schema");
-	let validator = must_load_validator(schema_file, true);
+	let validator = must_load_validator(SchemaType::Rule);
 
 	let mut all_rules: HashMap<String, Rule> = HashMap::new();
 	let mut all_rulesets: HashMap<String, RuleSet> = HashMap::new();
