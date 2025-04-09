@@ -1,0 +1,12 @@
+#
+# this is the config file for namelint itself
+#
+dirs: [ "." ]
+tests:
+  - paths:
+      - "**/*"
+    rules:
+      - no-msdos-reserved
+      - no-whitespace
+    rulesets:
+      - linux

@@ -1,3 +1,5 @@
+use std::{ffi::OsString, path::{Path, PathBuf}};
+
 use regex::Regex;
 use serde;
 
@@ -39,4 +41,25 @@ pub struct RuleSet {
 pub struct RuleFile {
 	pub rules: Option<Vec<Rule>>,
 	pub rulesets: Option<Vec<RuleSet>>,
+}
+
+#[derive(serde::Deserialize, Debug, Clone)]
+pub struct FileData {
+	pub path: PathBuf,
+	pub passed: Vec<String>,
+	pub failed: Vec<String>,
+	pub fatal: bool,			// if true, skip all other rules
+}
+
+#[derive(serde::Deserialize, Debug, Clone)]
+pub struct ConfigTest {
+	paths: Vec<String>,
+	pub rules: Vec<String>,
+	pub rulesets: Vec<String>,
+}
+
+#[derive(serde::Deserialize, Debug, Clone)]
+pub struct ConfigFile{
+	pub dirs: Vec<String>,
+	pub tests: Vec<ConfigTest>,
 }
