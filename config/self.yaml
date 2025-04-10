@@ -2,11 +2,15 @@
 # this is the config file for namelint itself
 #
 dirs: [ "." ]
-tests:
+ignore-dirs:
+  - ".git"
+  - ".jekyll-cache"
+  - "target"
+  - "_site"
+lints:
   - paths:
       - "**/*"
     rules:
       - no-msdos-reserved
       - no-whitespace
-    rulesets:
-      - linux
+      - posix-portable

@@ -1,6 +1,6 @@
 use serde_json;
 use serde_yaml;
-use std::{error::Error, fs};
+//use std::fs;
 
 pub fn must_load_json(data: &str, src: &str) -> serde_json::Value {
 	let value = serde_json::from_str(data);
@@ -59,7 +59,7 @@ pub fn must_load_data(data: &str, data_type: &str, src: &str) -> serde_json::Val
 	}
 	ret_val
 }
-
+/*
 pub fn load_yaml_as_json(data: &str) -> Result<serde_json::Value, Box<dyn Error>> {
     let yaml_value: serde_yaml::Value = serde_yaml::from_str(data)?;
     let json_str = serde_json::to_string(&yaml_value)?;
@@ -84,3 +84,5 @@ pub fn must_load_file(file_name: &str) -> String {
 	}
 	data.unwrap()
 }
+
+*/

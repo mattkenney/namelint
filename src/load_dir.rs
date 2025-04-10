@@ -1,9 +1,9 @@
 
-use std::{collections::VecDeque, fs, path::{Path, PathBuf}};
+use std::{collections::{HashSet, VecDeque}, ffi::OsString, fs, path::{Path, PathBuf}};
 
 use crate::structs::FileData;
 
-pub fn load_dir(passed_dir:String, files: &mut Vec<FileData>) -> bool {
+pub fn load_dir(passed_dir:String, ignore_dirs: &HashSet<OsString>, files: &mut Vec<FileData>) -> bool {
 
 	let mut dir = passed_dir;
 
@@ -45,6 +45,12 @@ pub fn load_dir(passed_dir:String, files: &mut Vec<FileData>) -> bool {
 	if cpath != path {
 		println!("WARNING: canonicalized path is different: '{}'", cpath.to_string_lossy());
 	}
+	let cpath_str = cpath.to_str();
+	if cpath_str.is_none() {
+		println!("ERROR: canonical directory for {} is not valid UTF-8: '{}'", dir, cpath.to_string_lossy());
+		return false;
+	}
+	let cpath_len = cpath_str.unwrap().len() + 1;   // +1 for the trailing slash
 
 	let mut path_queue:VecDeque::<PathBuf> = VecDeque::new();
 	path_queue.push_back(path.to_path_buf());
@@ -56,7 +62,7 @@ pub fn load_dir(passed_dir:String, files: &mut Vec<FileData>) -> bool {
 		}
 		let next_path = next_path.unwrap();
 
-		let new_paths = visit_dir(&next_path, files);
+		let new_paths = visit_dir(cpath_len, &next_path, ignore_dirs, files);
 
 		for new_path in new_paths.iter() {
 			path_queue.push_back(new_path.clone());
@@ -68,6 +74,8 @@ pub fn load_dir(passed_dir:String, files: &mut Vec<FileData>) -> bool {
 fn fatal_file(dir: &PathBuf, message: &str) -> FileData {
 	return FileData {
 		path: dir.to_path_buf(),
+		lintpath: dir.to_string_lossy().to_string(),
+		file_name: "".to_string(),
 		passed: Vec::new(),
 		failed: vec![message.to_string()],
 		fatal: true,
@@ -76,7 +84,7 @@ fn fatal_file(dir: &PathBuf, message: &str) -> FileData {
 
 
 /* load all files in a directory, and return a list (possibly empty) of subdirectories */
-fn visit_dir(dir: &PathBuf, files: &mut Vec<FileData>) -> Vec<PathBuf> {
+fn visit_dir(root: usize, dir: &PathBuf, ignore_dirs: &HashSet<OsString>, files: &mut Vec<FileData>) -> Vec<PathBuf> {
 
 	let mut new_dirs:Vec::<PathBuf> = Vec::new();
 
@@ -117,15 +125,34 @@ fn visit_dir(dir: &PathBuf, files: &mut Vec<FileData>) -> Vec<PathBuf> {
 		let entry = entry.unwrap();
 		let entry_path = entry.path();
 		if entry_path.is_dir() {
-			new_dirs.push(entry_path);
+			let file_name = entry_path.file_name();
+			if file_name.is_none() {
+				files.push(fatal_file(&entry_path, "unable-to-get-directory-entry-name"));
+				continue;
+			}
+			let file_name = file_name.unwrap();
+			if ignore_dirs.contains(file_name) {
+				println!("DEBUG: ignoring directory {}", entry_path.display());
+				continue;
+			} else {
+				new_dirs.push(entry_path);
+			}
 		} else {
-			let file_data = FileData {
-				path: entry_path.clone(),
-				passed: Vec::new(),
-				failed: Vec::new(),
-				fatal: false,
-			};
-			files.push(file_data);
+			let entry_path_str = entry_path.to_str();
+			if entry_path_str.is_none() {
+				files.push(fatal_file(&entry_path, "path-not-str"));
+			} else {
+				let entry_path_str = entry_path_str.unwrap();
+				let file_data = FileData {
+					path: entry_path.clone(),
+					lintpath: entry_path_str[root..].to_string(),
+					file_name: entry_path.file_name().unwrap().to_str().unwrap().to_string(),
+					passed: Vec::new(),
+					failed: Vec::new(),
+					fatal: false,
+				};
+				files.push(file_data);
+			}
 		}
 	}
 	return new_dirs;

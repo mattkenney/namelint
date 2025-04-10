@@ -16,9 +16,9 @@ properties:
     description: Subdirectories to ignore
     items:
       type: string
-  tests:
+  lints:
     type: array
-    description: Apply filename rules to paths
+    description: Each lint will apply a set of rules to a set of paths
     items:
       type: object
       additionalProperties: false
@@ -52,4 +52,4 @@ properties:
           - paths
 required:
   - dirs
-  - tests
+  - lints

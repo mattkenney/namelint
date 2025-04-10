@@ -1,4 +1,5 @@
-use std::{ffi::OsString, path::{Path, PathBuf}};
+#[allow(dead_code)]
+use std::path::PathBuf;
 
 use regex::Regex;
 use serde;
@@ -46,20 +47,25 @@ pub struct RuleFile {
 #[derive(serde::Deserialize, Debug, Clone)]
 pub struct FileData {
 	pub path: PathBuf,
+	pub lintpath: String,
+	pub file_name: String,
 	pub passed: Vec<String>,
 	pub failed: Vec<String>,
 	pub fatal: bool,			// if true, skip all other rules
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
-pub struct ConfigTest {
-	paths: Vec<String>,
-	pub rules: Vec<String>,
-	pub rulesets: Vec<String>,
+pub struct ConfigLint {
+	pub name: Option<String>,
+	pub paths: Vec<String>,
+	pub rules: Option<Vec<String>>,
+	pub rulesets: Option<Vec<String>>,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
-pub struct ConfigFile{
-	pub dirs: Vec<String>,
-	pub tests: Vec<ConfigTest>,
+pub struct ConfigFile {
+	pub dirs: Option<Vec<String>>,
+	#[serde(rename = "ignore-dirs")]
+	pub ignore_dirs: Option<Vec<String>>,
+	pub lints: Vec<ConfigLint>,
 }

@@ -1,21 +1,24 @@
-#![allow(dead_code)]
+#[allow(dead_code)]
 
 mod safe_name;
 mod load;
 mod load_dir;
 mod parse_config;
 mod parse_rules;
+mod run_lint;
 mod schema;
 mod structs;
 mod rules;
 
-use std::{collections::HashMap, fs::{self}};
+use std::{collections::HashMap, ffi::OsString, fs::{self}};
 use clap::{arg, Command};
 use include_dir::{include_dir, Dir};
+use std::collections::HashSet;
 
 use load_dir::load_dir;
 use parse_config::parse_config;
 use parse_rules::parse_rules;
+use run_lint::run_lint;
 use schema::{must_load_validator, SchemaType};
 use structs::{ConfigFile, FileData, Rule, RuleSet};
 
@@ -85,7 +88,7 @@ fn main() {
 */
 
 	let config_validator = must_load_validator(SchemaType::Config);
-	let config:ConfigFile;
+	let mut config:ConfigFile;
 
 	let config_file = binding.get_one::<String>("config");
 	if config_file.is_some() {
@@ -104,34 +107,84 @@ fn main() {
 		config = parse_config(&config_str, "<default>", &config_validator);
 	}
 
+	//LATER: load rules/rulesets from config...
+
 	let dirs:Vec<String>;
 
 	if binding.contains_id("path") {
-		println!("DEBUG: using paths from the command line");
+		println!("DEBUG: using directories from the command line");
 		dirs = binding.get_many::<String>("path")
 			.unwrap()
 			.map(|s| s.to_string())
 			.collect();
-	} else if config.dirs.len() > 0 {
-		println!("DEBUG: using config paths");
-		dirs = config.dirs;
+	} else if config.dirs.is_some() {
+		println!("DEBUG: using directories from config file");
+		dirs = config.dirs.unwrap();
 	} else {
-		println!("ERROR: no paths to check");
-		std::process::exit(4);
+		println!("DEBUG: using current directory");
+		dirs = vec![".".to_string()];
 	}
 
-	println!("DEBUG: checking {} listed directories", dirs.len());
+	if dirs.len() == 0 {
+		println!("ERROR: no directories to check");
+		std::process::exit(6);
+	}
+
+	let ignore_dirs: HashSet<OsString>;
+	if config.ignore_dirs.is_some() {
+		println!("DEBUG: using ignore directories from config file");
+		ignore_dirs = config.ignore_dirs.unwrap().into_iter().map(OsString::from).collect();
+	} else {
+		println!("DEBUG: no ignore directories");
+		ignore_dirs = HashSet::new();
+	}
+
+	println!("DEBUG: scanning {} listed directories", dirs.len());
 
 	let mut files:Vec<FileData> = Vec::new();
 	for dir in dirs.iter() {
 		let dir = dir.to_string();
-		if load_dir(dir.clone(), &mut files) == false {
+		if load_dir(dir.clone(), &ignore_dirs, &mut files) == false {
 			println!("ERROR: unable to load directory {}", dir);
 			std::process::exit(5);
 		}
 	}
-	println!("DEBUG: checking {} files", files.len());
+	println!("DEBUG: directory scan complete - checking {} files", files.len());
 
+	for file in files.iter() {
+		println!("DEBUG: file '{}'", file.lintpath);
+	}
+
+	for (index, lint) in config.lints.iter_mut().enumerate() {
+		if lint.name.is_none() {
+			lint.name = Some(format!("#{}", index));
+		}
+		println!("DEBUG: applying lint {}", lint.name.clone().unwrap());
+		run_lint(lint, &mut files, &all_rules, &all_rulesets);
+	}
+
+	for file in files.iter_mut() {
+		if file.passed.len() == 0  && file.failed.len() == 0 {
+			file.failed.push("not-linted".to_string());
+		}
+	}
+
+	let mut pass_count = 0;
+	let mut fail_count = 0;
+
+	for file in files.iter() {
+		if file.failed.len() > 0 {
+			println!("ERROR: file '{}' failed: {}", file.lintpath, file.failed.join(", "));
+			fail_count += 1;
+		} else {
+			pass_count += 1;
+		}
+	}
+
+	println!("INFO: {} files passed, {} files failed", pass_count, fail_count);
+	if fail_count > 0 {
+		std::process::exit(1);
+	}
 
 }
 

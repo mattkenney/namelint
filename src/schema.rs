@@ -1,5 +1,5 @@
 use jsonschema::{self, Validator};
-use crate::load::{must_load_data, must_load_file};
+use crate::load::must_load_data;
 use std::fmt;
 
 const DEFAULT_RULE_SCHEMA: &'static str = include_str!("../docs/namelint-rule-schema.yaml");
