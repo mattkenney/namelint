@@ -28,6 +28,8 @@ properties:
           description: Rules to specifically disable
           items:
             type: string
+        lint_id:
+          type: string
         paths:
           type: array
           description: Path patterns to apply these rules to
@@ -45,11 +47,17 @@ properties:
             type: string
       anyOf:
         - required:
+          - lint_id
           - rulesets
           - paths
         - required:
+          - lint_id
           - rules
           - paths
+  rules:
+    $ref: namelint-rule-schema.json#/properties/rules
+  rulesets:
+    $ref: namelint-rule-schema.json#/properties/rulesets
 required:
   - dirs
   - lints
