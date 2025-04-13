@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-use regex::RegexBuilder;
 
 use crate::load::{must_load_yaml, must_yaml_to_json};
-use crate::structs::{Rule, RuleFile, RuleSet};
+use crate::structs::{RuleFile, RuleFn, RuleSet};
+use crate::regex_rule::build_regex_rule_fn;
 
-pub fn parse_rules(body: &str, src: &str, validator: &jsonschema::Validator, all_rules: &mut HashMap<String, Rule>, all_rulesets: &mut HashMap<String, RuleSet>) {
+pub fn parse_rules(body: &str, src: &str, validator: &jsonschema::Validator, all_rules: &mut HashMap<String, RuleFn>, all_rulesets: &mut HashMap<String, RuleSet>) {
 	let yaml_data = must_load_yaml(body, &src);
 	let json_data = must_yaml_to_json(&yaml_data, &src);
 	let is_valid = validator.validate(&json_data);
@@ -27,25 +27,11 @@ pub fn parse_rules(body: &str, src: &str, validator: &jsonschema::Validator, all
 	}
 
 	if rulef.rules.is_some() {
-		let mut rules = rulef.rules.unwrap();
-		for rule in rules.iter_mut() {
+		let rules = rulef.rules.unwrap();
+		for rule in rules.iter() {
 			println!("DEBUG: Loading rule: {} ({})", rule.title, rule.rule_id);
-			if rule.regex.is_some() {
-				let rule_regex = rule.regex.as_mut().unwrap();
-				let mut regex_builder = RegexBuilder::new(&rule_regex.pattern);
-				if rule_regex.case_insensitive {
-					regex_builder.case_insensitive(true);
-				}
-				let regex = regex_builder.build();
-				if regex.is_ok() {
-					rule_regex.regex = regex.ok();
-				} else {
-					println!("ERROR: Invalid regex for rule_id {}: {}", rule.rule_id, regex.err().unwrap());
-					continue;
-				}
-
-			}
-			all_rules.insert(rule.rule_id.clone(), rule.clone());
+			let tmp_rule = rule.clone();
+			all_rules.insert(rule.rule_id.clone(), build_regex_rule_fn(&tmp_rule));
 		}
 	}
 }

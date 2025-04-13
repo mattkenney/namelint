@@ -62,6 +62,12 @@ pub struct ConfigLint {
 	pub rulesets: Option<Vec<String>>,
 }
 
+pub struct Lint {
+	pub name: String,
+	pub paths: Vec<String>,
+	pub rules: Option<Vec<String>>,
+}
+
 #[derive(serde::Deserialize, Debug, Clone)]
 pub struct ConfigFile {
 	pub dirs: Option<Vec<String>>,
@@ -69,3 +75,7 @@ pub struct ConfigFile {
 	pub ignore_dirs: Option<Vec<String>>,
 	pub lints: Vec<ConfigLint>,
 }
+
+//pub type RuleFn = fn(String) -> bool;
+//pub type RuleFn = Box<dyn Fn(&str) -> bool>;
+pub type RuleFn<'a> = Box<dyn Fn(&str) -> bool + 'a>;

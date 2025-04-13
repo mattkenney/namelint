@@ -9,6 +9,7 @@ mod run_lint;
 mod schema;
 mod structs;
 mod rules;
+mod regex_rule;
 
 use std::{collections::HashMap, ffi::OsString, fs::{self}};
 use clap::{arg, Command};
@@ -20,7 +21,7 @@ use parse_config::parse_config;
 use parse_rules::parse_rules;
 use run_lint::run_lint;
 use schema::{must_load_validator, SchemaType};
-use structs::{ConfigFile, FileData, Rule, RuleSet};
+use structs::{ConfigFile, FileData, Lint, RuleFn, RuleSet};
 
 static RULES_DIR: Dir = include_dir!("./rules");
 
@@ -55,7 +56,7 @@ fn main() {
 	//LATER: convert to log level let verbose = binding.get_count("verbose");
 	let rule_validator = must_load_validator(SchemaType::Rule);
 
-	let mut all_rules: HashMap<String, Rule> = HashMap::new();
+	let mut all_rules: HashMap<String, RuleFn> = HashMap::new();
 	let mut all_rulesets: HashMap<String, RuleSet> = HashMap::new();
 
 	for rule_file in RULES_DIR.find("*.yaml").unwrap() {
@@ -155,12 +156,14 @@ fn main() {
 		println!("DEBUG: file '{}'", file.lintpath);
 	}
 
-	for (index, lint) in config.lints.iter_mut().enumerate() {
-		if lint.name.is_none() {
-			lint.name = Some(format!("#{}", index));
-		}
-		println!("DEBUG: applying lint {}", lint.name.clone().unwrap());
-		run_lint(lint, &mut files, &all_rules, &all_rulesets);
+	for (index, cfg_lint) in config.lints.iter_mut().enumerate() {
+		let lint:Lint = Lint {
+			name: cfg_lint.name.clone().unwrap_or_else(|| format!("#{}", index)),
+			paths: cfg_lint.paths.clone(),
+			rules: cfg_lint.rules.clone(),
+		};
+		println!("DEBUG: applying lint {}", lint.name);
+		run_lint(&lint, &mut files, &all_rules, &all_rulesets);
 	}
 
 	for file in files.iter_mut() {
