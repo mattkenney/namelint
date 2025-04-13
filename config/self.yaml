@@ -8,7 +8,8 @@ ignore-dirs:
   - "target"
   - "_site"
 lints:
-  - paths:
+  - lint_id: self
+    paths:
       - "**/*"
     rules:
       - no-msdos-reserved
