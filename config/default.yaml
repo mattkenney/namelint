@@ -3,7 +3,8 @@
 #
 dirs: [ "." ]
 lints:
-  - paths:
+  - lint_id: default
+    paths:
       - "**/*"
     rules:
       - no-msdos-reserved
