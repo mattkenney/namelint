@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#![allow(unused)]
 
 mod safe_name;
 mod load;
