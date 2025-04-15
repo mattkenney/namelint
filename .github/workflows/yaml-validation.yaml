@@ -1,4 +1,4 @@
-name: rule-validation
+name: yaml-validation
 
 on:
   push:
