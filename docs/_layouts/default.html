@@ -71,20 +71,21 @@
 		<div class="row">
 			<div class="col pt-2">
 				<div class="pb-2 d-flex align-items-center justify-content-between">
-				<h1 class="flex-grow-1">
-					{% if page.h1 %}{{page.h1}}{% else %}{{page.title}}{% endif %}
-				</h1>
-				<div class="text-end">
-					{% if page.previous.url %}
-					<a class="btn btn-outline-secondary" href="{{page.previous.url}}" title="{{page.previous.title}}">&laquo;<span
-							class="d-none d-lg-inline"> {{page.previous.title}}</span></a>
-					{% endif %}
-					{% if page.next.url %}
-					<a class="btn btn-outline-secondary" href="{{page.next.url}}" title="{{page.next.title}}"><span
-							class="d-none d-lg-inline">{{page.next.title}} </span>&raquo;</a>
-					{% endif %}
+					<h1 class="flex-grow-1">
+						{% if page.h1 %}{{page.h1}}{% else %}{{page.title}}{% endif %}
+					</h1>
+					<div class="text-end">
+						{% if page.previous.url %}
+						<a class="btn btn-outline-secondary" href="{{page.previous.url}}" title="{{page.previous.title}}">&laquo;<span
+								class="d-none d-lg-inline"> {{page.previous.title}}</span></a>
+						{% endif %}
+						{% if page.next.url %}
+						<a class="btn btn-outline-secondary" href="{{page.next.url}}" title="{{page.next.title}}"><span
+								class="d-none d-lg-inline">{{page.next.title}} </span>&raquo;</a>
+						{% endif %}
+					</div>
 				</div>
-				</div>
+{% if page.draft %}<div class="alert alert-warning">This post is a draft!</div>{% endif %}
 {{content}}
 			{% if page.url contains "blog/"-%}
 				<p class="text-center">
